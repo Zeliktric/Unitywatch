@@ -29,9 +29,10 @@ namespace Unitywatch
         /// <param name="to">The entity that died.</param>
         /// <param name="isFriendly">Whether the 'from' entity is part of the same team as the (real) player.</param>
         /// <param name="headshot">Whether the final blow came from a headshot.</param>
+        /// <param name="isEnvironmentalKill">Whether the 'value' is an environmental kill.</param>
         /// <param name="ability">The ability that was used to commit the final blow, if applicable.</param>
         /// <param name="ultimate">The ultimate ability that was used to commit the final blow, if applicable.</param>
-        public void NewEntry(Entity from, Entity to, bool isFriendly, bool headshot, AbilityData ability = null, AbilityData ultimate = null)
+        public void NewEntry(Entity from, Entity to, bool isFriendly, bool headshot, bool isEnvironmentalKill, AbilityData ability = null, AbilityData ultimate = null)
         {
             Entity friendly,
                 enemy;
@@ -72,6 +73,7 @@ namespace Unitywatch
                 entry.transform.Find("Action/Ultimate").gameObject.SetActive(true);
                 entry.transform.Find("Action/Ultimate/Background/Icon").GetComponent<Image>().sprite = ultimate.AbilityIcon;
             }
+            if (isEnvironmentalKill) entry.transform.Find("Environmental Kill").gameObject.SetActive(true);
 
             entry.transform.Find("Enemy/Player Name").GetComponent<TMP_Text>().text = enemy.EntityName;
             entry.transform.Find("Enemy/Icon/Entity Icon").GetComponent<Image>().sprite = enemy.Hero.HeroData.Hero2DIcon;

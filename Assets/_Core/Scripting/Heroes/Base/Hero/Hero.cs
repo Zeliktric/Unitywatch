@@ -476,23 +476,34 @@ namespace Unitywatch
         ///     - whether ultimate and perk points should be awarded.
         /// </summary>
         /// <param name="value">The base value of the received damage/healing.</param>
-        /// <param name="damage">Whether 'value' is damage or not.</param>
+        /// <param name="isDamage">Whether 'value' is damage or healing.</param>
         /// <param name="from">The entity that 'value' is coming from.</param>
         /// <param name="isUltimate">Whether the 'value' came from an ultimate being used.</param>
         /// <param name="abilityUsed">Whether the 'value' came from an ability being used.</param>
-        /// <param name="headshot">Whether the 'value' is a headshot or not.</param>
+        /// <param name="isHeadshot">Whether the 'value' is a headshot.</param>
+        /// <param name="isEnvironmentalKill">Whether the 'value' is an environmental kill.</param>
         /// <param name="autoRegen">Whether the 'value' came from auto-regen.</param>
         /// <param name="affectArmour">How the 'value' should affect any armour of this hero.</param>
-        public void UpdateHP(double value, bool damage, Entity from, bool isUltimate, AbilityData abilityUsed = null, bool headshot = false, bool autoRegen = false, string affectArmour = "yes")
+        public void UpdateHP(
+            double value,
+            bool isDamage,
+            Entity from,
+            bool isUltimate,
+            AbilityData abilityUsed = null,
+            bool isHeadshot = false,
+            bool isEnvironmentalKill = false,
+            bool autoRegen = false,
+            string affectArmour = "yes"
+        )
         {
             // Apply the healing or damage modification.
-            value *= damage && from ? from.Hero.DamageModification : HealingModification;
+            value *= isDamage && from ? from.Hero.DamageModification : HealingModification;
 
             double tempValue = value;
             double hitValue = 0;
-            bool selfDamage = damage && from?.EntityID == entity.EntityID;
+            bool selfDamage = isDamage && from?.EntityID == entity.EntityID;
 
-            if (damage)
+            if (isDamage)
             {
                 timeSinceDamageTaken = Time.time;
 
@@ -654,12 +665,12 @@ namespace Unitywatch
                 if (from && !selfDamage)
                 {
                     // Award the final blow to the 'from' entity if they exist (and they are not the entity that died).
-                    from.FinalBlow(entity, abilityUsed, headshot, isUltimate);
+                    from.FinalBlow(entity, abilityUsed, isHeadshot, isUltimate, isEnvironmentalKill);
                 }
                 else
                 {
                     // This entity either killed themselves or died to the void by themself.
-                    entity.FinalBlow(entity, null, false, false);
+                    entity.FinalBlow(entity, null, false, false, isEnvironmentalKill);
                 }
                 
             }
@@ -671,7 +682,7 @@ namespace Unitywatch
                 if (from) CalculatePerkProgress(hitValue, from);
             }
 
-            if (damage && from) ShowUIHealth(from);
+            if (isDamage && from) ShowUIHealth(from);
 
             // Spawn a world-UI number to show the damage / healing done.
             if (entity.hitValuePrefab != null && hitValue != 0) entity.hitValuePrefab.Spawn(entity.hitValueParent.transform.position, (float)hitValue, entity.hitValueParent);

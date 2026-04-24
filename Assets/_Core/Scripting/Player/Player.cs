@@ -66,7 +66,6 @@ namespace Unitywatch
 
         /// <summary>
         /// Called when this (real) player interacts with a trigger collider (a collider that you can pass through without physically colliding with).
-        /// This functin is used primarily for interacting with consumables.
         /// </summary>
         /// <param name="col"></param>
         protected void OnTriggerEnter(Collider col)
@@ -76,9 +75,15 @@ namespace Unitywatch
             if (col.gameObject.layer == LayerMask.NameToLayer("Void"))
             {
                 // Entity has fallen into the void so instantly kill them
-                // TODO: award kill credit if a player knocks another player into the void (if knockback damage = true)
+                // TODO: award kill credit if a player knocks another player into the void (track knockback damage)
 
-                hero.UpdateHP(hero.TotalHP(), true, null, false);
+                hero.UpdateHP(
+                    value: hero.TotalHP(),
+                    isDamage: true,
+                    from: null,
+                    isUltimate: false,
+                    isEnvironmentalKill: true
+                );
                 return;
             }
 
@@ -123,9 +128,10 @@ namespace Unitywatch
         /// <param name="abilityData">The data of the ability used to inflict the final blow, if applicable.</param>
         /// <param name="headshot">Whether the final blow was inflicted by a headshot.</param>
         /// <param name="isUltimate">Whether an ultimate ability was used to inflict the final blow.</param>
-        public override void FinalBlow(Entity to, AbilityData abilityData, bool headshot, bool isUltimate)
+        /// <param name="isEnvironmentalKill">Whether the 'value' is an environmental kill.</param>
+        public override void FinalBlow(Entity to, AbilityData abilityData, bool headshot, bool isUltimate, bool isEnvironmentalKill)
         {
-            base.FinalBlow(to, abilityData, headshot, isUltimate);
+            base.FinalBlow(to, abilityData, headshot, isUltimate, isEnvironmentalKill);
 
             skullTime = 0f;
         }

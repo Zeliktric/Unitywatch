@@ -208,22 +208,23 @@ namespace Unitywatch
         /// <param name="abilityData">The data of the ability used to inflict the final blow, if applicable.</param>
         /// <param name="headshot">Whether the final blow was inflicted by a headshot.</param>
         /// <param name="isUltimate">Whether an ultimate ability was used to inflict the final blow.</param>
-        public virtual void FinalBlow(Entity to, AbilityData abilityData, bool headshot, bool isUltimate)
+        /// <param name="isEnvironmentalKill">Whether the 'value' is an environmental kill.</param>
+        public virtual void FinalBlow(Entity to, AbilityData abilityData, bool headshot, bool isUltimate, bool isEnvironmentalKill)
         {
             if (isUltimate && abilityData != null)
             {
                 // Final blow by ultimate ability.
-                GameObject.FindWithTag("KillFeed").GetComponent<KillFeed>().NewEntry(this, to, team == player.Team, headshot, ultimate: abilityData);
+                GameObject.FindWithTag("KillFeed").GetComponent<KillFeed>().NewEntry(this, to, team == player.Team, headshot, isEnvironmentalKill, ultimate: abilityData);
             }
             else if (!isUltimate && abilityData != null)
             {
                 // Final blow by regular ability.
-                GameObject.FindWithTag("KillFeed").GetComponent<KillFeed>().NewEntry(this, to, team == player.Team, headshot, ability: abilityData);
+                GameObject.FindWithTag("KillFeed").GetComponent<KillFeed>().NewEntry(this, to, team == player.Team, headshot, isEnvironmentalKill, ability: abilityData);
             }
             else
             {
                 // Final blow by weapon.
-                GameObject.FindWithTag("KillFeed").GetComponent<KillFeed>().NewEntry(this, to, team == player.Team, headshot);
+                GameObject.FindWithTag("KillFeed").GetComponent<KillFeed>().NewEntry(this, to, team == player.Team, headshot, isEnvironmentalKill);
             }
 
         }
@@ -283,7 +284,7 @@ namespace Unitywatch
             }
 
             // Update this entity's HP.
-            hero.UpdateHP(hitValue, team != hitFrom.Team, hitFrom, hitFrom.hero.UltimateSystem.Active, abilityUsed: abilityData, headshot: isHeadshot && headshotMultiplier > 1f);
+            hero.UpdateHP(hitValue, team != hitFrom.Team, hitFrom, hitFrom.hero.UltimateSystem.Active, abilityUsed: abilityData, isHeadshot: isHeadshot && headshotMultiplier > 1f);
         }
 
         /// <summary>
